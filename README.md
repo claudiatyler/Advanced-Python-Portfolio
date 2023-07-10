@@ -3761,6 +3761,725 @@ Phylo.draw_ascii(tree)
 
 
 
+## Pairwise Alignment
+```python
+from Bio import Align
+```
+
+
+```python
+aligner = Align.PairwiseAligner()
+```
+
+
+```python
+# can adjust the settings for your analysis
+aligner = Align.PairwiseAligner(match_score = 1.0)
+```
+
+
+```python
+# creating target sequence - what we are aligning too
+target = "GAACT"
+```
+
+
+```python
+# creating a sequence - what we are interested in
+query = "GAT"
+```
+
+
+```python
+# calculates the score of the alignment - we have three overlaps
+score = aligner.score(target, query)
+```
+
+
+```python
+print(score)
+```
+
+    3.0
+
+
+
+```python
+# aligning our sequence
+alignments = aligner.align(target, query)
+```
+
+
+```python
+# shows the different ways to align the sequences
+for alignment in alignments:
+    print(alignment)
+```
+
+    target            0 GAACT 5
+                      0 ||--| 5
+    query             0 GA--T 3
+    
+    target            0 GAACT 5
+                      0 |-|-| 5
+    query             0 G-A-T 3
+    
+
+
+
+```python
+# running the same thing, with a different sequence
+aligner.mode = "local"
+```
+
+
+```python
+target = "AGAACTC"
+```
+
+
+```python
+query = "GAACT"
+```
+
+
+```python
+score = aligner.score(target, query)
+```
+
+
+```python
+# five of our nucleotides align
+score
+```
+
+
+
+
+    5.0
+
+
+
+
+```python
+alignments = aligner.align(target, query)
+```
+
+
+```python
+# shows the five nucleotides that align - the entirety of query was found in target
+for alignment in alignments:
+    print(alignment)
+```
+
+    target            1 GAACT 6
+                      0 ||||| 5
+    query             0 GAACT 5
+    
+
+
+
+```python
+# here you can see all the scores
+print(aligner)
+```
+
+    Pairwise sequence aligner with parameters
+      wildcard: None
+      match_score: 1.000000
+      mismatch_score: 0.000000
+      target_internal_open_gap_score: 0.000000
+      target_internal_extend_gap_score: 0.000000
+      target_left_open_gap_score: 0.000000
+      target_left_extend_gap_score: 0.000000
+      target_right_open_gap_score: 0.000000
+      target_right_extend_gap_score: 0.000000
+      query_internal_open_gap_score: 0.000000
+      query_internal_extend_gap_score: 0.000000
+      query_left_open_gap_score: 0.000000
+      query_left_extend_gap_score: 0.000000
+      query_right_open_gap_score: 0.000000
+      query_right_extend_gap_score: 0.000000
+      mode: local
+    
+
+
+
+```python
+# shows what algorithm the aligner is using
+aligner.algorithm
+```
+
+
+
+
+    'Smith-Waterman'
+
+
+
+
+```python
+# can also set significance - if the difference is less than epsilon, will be considered the same
+aligner.epsilon
+```
+
+
+
+
+    1e-06
+
+
+
+
+```python
+# changing the target and query
+target = "GAACT"
+query = "GAT"
+```
+
+
+```python
+alignments = aligner.align(target, query)
+```
+
+
+```python
+alignment = alignments[0]
+```
+
+
+```python
+# working with alignment objects
+alignment
+```
+
+
+
+
+    <Alignment object (2 rows x 5 columns) at 0x7f2e4c6ae210>
+
+
+
+
+```python
+# pulling out the score
+alignment.score
+```
+
+
+
+
+    3.0
+
+
+
+
+```python
+# pulling out the target
+alignment.target
+```
+
+
+
+
+    'GAACT'
+
+
+
+
+```python
+# pulling out the query
+alignment.query
+```
+
+
+
+
+    'GAT'
+
+
+
+
+```python
+# printing the alignment
+print(alignment)
+```
+
+    target            0 GAACT 5
+                      0 ||--| 5
+    query             0 GA--T 3
+    
+
+
+
+```python
+# pulling out the coordinates
+alignment.coordinates
+```
+
+
+
+
+    array([[0, 2, 4, 5],
+           [0, 2, 2, 3]])
+
+
+
+
+```python
+# looking at the length of the alignment
+len(alignment)
+```
+
+
+
+
+    2
+
+
+
+
+```python
+# looking at the shape of the alignment
+alignment.shape
+```
+
+
+
+
+    (2, 5)
+
+
+
+
+```python
+# setting the mode of the alignment
+aligner.mode = "local"
+```
+
+
+```python
+local_alignments = aligner.align("TGAACT", "GAC")
+```
+
+
+```python
+local_alignment = local_alignments[0]
+```
+
+
+```python
+# drops off the letters not used (the Ts on the end)
+print(local_alignment)
+```
+
+    target            1 GAAC 5
+                      0 ||-| 4
+    query             0 GA-C 3
+    
+
+
+
+```python
+# looking at the shape
+local_alignment.shape
+```
+
+
+
+
+    (2, 4)
+
+
+
+
+```python
+aligner.mode = "global"
+```
+
+
+```python
+# changing the mismatch score
+aligner = Align.PairwiseAligner(match = 1.0, mismatch_score = -10)
+```
+
+
+```python
+print(aligner)
+```
+
+    Pairwise sequence aligner with parameters
+      wildcard: None
+      match_score: 1.000000
+      mismatch_score: -10.000000
+      target_internal_open_gap_score: 0.000000
+      target_internal_extend_gap_score: 0.000000
+      target_left_open_gap_score: 0.000000
+      target_left_extend_gap_score: 0.000000
+      target_right_open_gap_score: 0.000000
+      target_right_extend_gap_score: 0.000000
+      query_internal_open_gap_score: 0.000000
+      query_internal_extend_gap_score: 0.000000
+      query_left_open_gap_score: 0.000000
+      query_left_extend_gap_score: 0.000000
+      query_right_open_gap_score: 0.000000
+      query_right_extend_gap_score: 0.000000
+      mode: global
+    
+
+
+
+```python
+alignments = aligner.align("AAACAAA", "AAAGAAA")
+```
+
+
+```python
+len(alignments)
+```
+
+
+
+
+    2
+
+
+
+
+```python
+# a gap was introduced; because of the mismatch score, it would rather put gaps in than have a mismatch
+print(alignments[0])
+```
+
+    target            0 AAAC-AAA 7
+                      0 |||--||| 8
+    query             0 AAA-GAAA 7
+    
+
+
+
+```python
+# next alignment - same thing but C and G are reversed
+print(alignments[1])
+```
+
+    target            0 AAA-CAAA 7
+                      0 |||--||| 8
+    query             0 AAAG-AAA 7
+    
+
+
+
+```python
+# printing the previous local alignment
+print(local_alignment)
+```
+
+    target            1 GAAC 5
+                      0 ||-| 4
+    query             0 GA-C 3
+    
+
+
+
+```python
+# sorting the alignment
+local_alignment.sort()
+```
+
+
+```python
+print(local_alignment)
+```
+
+    target            0 GA-C 3
+                      0 ||-| 4
+    query             1 GAAC 5
+    
+
+
+
+```python
+# aligning to the reverse complement
+```
+
+
+```python
+from Bio.Seq import reverse_complement
+```
+
+
+```python
+target = "AAACCC"
+```
+
+
+```python
+query = "AACC"
+```
+
+
+```python
+aligner = Align.PairwiseAligner(mismatch_score = -1, internal_gap_score = -1)
+```
+
+
+```python
+# score for regular alignment
+aligner.score(target, query)
+```
+
+
+
+
+    4.0
+
+
+
+
+```python
+# score for aligning to reverse complement
+aligner.score(target, reverse_complement(query))
+```
+
+
+
+
+    0.0
+
+
+
+
+```python
+# score for aligning to the negative strand
+aligner.score(target, reverse_complement(query), strand = "-")
+```
+
+
+
+
+    4.0
+
+
+
+
+```python
+aligner.score(target, query, strand = "-")
+```
+
+
+
+
+    0.0
+
+
+
+
+```python
+#saving the alignments
+alignments = aligner.align(target, query)
+```
+
+
+```python
+len(alignments)
+```
+
+
+
+
+    1
+
+
+
+
+```python
+print(alignments[0])
+```
+
+    target            0 AAACCC 6
+                      0 -||||- 6
+    query             0 -AACC- 4
+    
+
+
+
+```python
+# saving to a bed file
+print(alignments[0].format("bed"))
+```
+
+    target	1	5	query	4.0	+	1	5	0	1	4,	0,
+    
+
+
+
+```python
+# the reverse complement of the negative strand is the same as the regular stran
+alignments = aligner.align(target, reverse_complement(query), strand = "-")
+```
+
+
+```python
+print(alignments[0].format("bed"))
+```
+
+    target	1	5	query	4.0	-	1	5	0	1	4,	0,
+    
+
+
+
+```python
+# just the negative strand
+alignments = aligner.align(target, query, strand = "-")
+```
+
+
+```python
+len(alignments)
+```
+
+
+
+
+    2
+
+
+
+
+```python
+# shows it is completely unaligned - why it couldn't be printed in the bed format
+print(alignments[0])
+```
+
+    target            0 AAACCC----  6
+                      0 ---------- 10
+    query             4 ------GGTT  0
+    
+
+
+
+```python
+print(alignments[1])
+```
+
+    target            0 ----AAACCC  6
+                      0 ---------- 10
+    query             4 GGTT------  0
+    
+
+
+
+```python
+# changing gap scores
+aligner.left_gap_score = -0.5
+```
+
+
+```python
+aligner.right_gap_score = -0.2
+```
+
+
+```python
+aligner.score(target, query)
+```
+
+
+
+
+    3.3
+
+
+
+
+```python
+alignments = aligner.align(target, query)
+```
+
+
+```python
+len(alignments)
+```
+
+
+
+
+    1
+
+
+
+
+```python
+print(alignments[0])
+```
+
+    target            0 AAACCC 6
+                      0 -||||- 6
+    query             0 -AACC- 4
+    
+
+
+
+```python
+# same, with reverse complement and negative strand
+alignments = aligner.align(target, reverse_complement(query), strand = "-")
+```
+
+
+```python
+print(alignments)
+```
+
+    <Bio.Align.PairwiseAlignments object at 0x7f2e4c620b90>
+
+
+
+```python
+aligner.score(target, reverse_complement(query), strand = "-")
+```
+
+
+
+
+    3.3
+
+
+
+
+```python
+print(alignments[0])
+```
+
+    target            0 AAACCC 6
+                      0 -||||- 6
+    query             4 -AACC- 0
+    
+
+
+
+```python
+# same, with reverse complement and positive strand
+alignments = aligner.align(target, reverse_complement(query), strand = "+")
+```
+
+
+```python
+# shows that mapping our dna to the reverse complement gives us a worse score than the standard string
+aligner.score(target, reverse_complement(query), strand = "+")
+```
+
+
+
+
+    -2.0
+
+
+
+
+```python
+
+```
 
 
 ## Challenge 1 - Blast
